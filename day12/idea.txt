@@ -1,0 +1,31 @@
+idea:
+
+first thing's first, this is very picross.
+
+given a line of length n with m groups, we can solve in O((n^2)*m) with DP.
+let DP[a,b] represent the number of ways to fit the first a groups into the
+first b tiles. thus we want DP[m,n].
+
+to find DP[a,b], take group a and try placing it from right to left. if you
+find a valid position starting at s, then add DP[a-1,max(s-1,0)] to the total.
+keep doing this until s < 0, where the loop terminates
+
+base cases:
+DP[0,>=0] = 1 (only 1 way to place 0 groups in >=0 tiles)
+    (though if there are any # left over, it's 0 - we didn't place enough)
+DP[>0,0] = 0 (no ways to place >0 groups in 0 tiles)
+
+then we can just pretty much do
+for (a in [0,m])
+    for (b in [0,n])
+        calculate DP[a,b]
+when we reach the calculate line we won't need to recurse; will always have the
+necessary dependencies
+
+this is probably unnecessarily heavyweight for this problem, at least for part
+one. would really only need this if we were dealing with hundreds of groups per
+line. but DP is fun, and i'd like the practice!
+
+
+
+edit after seeing part 2: lmao
