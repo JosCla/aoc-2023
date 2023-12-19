@@ -76,81 +76,64 @@ def processPart(workflows, part):
                     break
 
 def totalAcceptedIn(workflows, name, instrNum, ranges):
-    while True:
-        workflow = workflows[name]
-        for i in range(instrNum, len(workflow)):
-            instr = workflow[i]
-            if instr == 'A':
-                # auto-accept
-                return getRangesSize(ranges)
-            elif instr == 'R':
-                # auto-reject
-                return 0
+    workflow = workflows[name]
+    instr = workflow[instrNum]
 
-            colonSplit = instr.split(':')
-            if len(colonSplit) == 1:
-                # jump to workflow
-                name = instr
-                instrNum = 0
-                break
+    if instr == 'A':
+        # auto-accept
+        return getRangesSize(ranges)
+    elif instr == 'R':
+        # auto-reject
+        return 0
 
-            gtSplit = colonSplit[0].split('>')
-            if len(gtSplit) == 1:
-                # less than
-                ltSplit = colonSplit[0].split('<')
-                bound = int(ltSplit[1])
-                (r1, r2) = ranges[ltSplit[0]]
+    colonSplit = instr.split(':')
+    if len(colonSplit) == 1:
+        # jump to workflow
+        return totalAcceptedIn(workflows, instr, 0, ranges)
 
-                total = 0
+    rangesTrue = copy.deepcopy(ranges)
+    rangesFalse = copy.deepcopy(ranges)
+    doTrue = False
+    doFalse = False
 
-                # true branch
-                if r1 < bound:
-                    rangesTrue = copy.deepcopy(ranges)
-                    # rangesTrue = [key: value for key, value in ranges.items()]
-                    rangesTrue[ltSplit[0]] = (r1, bound - 1)
+    gtSplit = colonSplit[0].split('>')
+    if len(gtSplit) == 1:
+        # less than
+        ltSplit = colonSplit[0].split('<')
+        bound = int(ltSplit[1])
+        (r1, r2) = ranges[ltSplit[0]]
 
-                    if colonSplit[1] == 'A':
-                        total += getRangesSize(rangesTrue)
-                    elif colonSplit[1] == 'R':
-                        total += 0
-                    else:
-                        total += totalAcceptedIn(workflows, colonSplit[1], 0, rangesTrue)
+        if r1 < bound:
+            rangesTrue[ltSplit[0]] = (r1, bound - 1)
+            doTrue = True
 
-                # false branch
-                if r2 >= bound:
-                    rangesFalse = copy.deepcopy(ranges)
-                    rangesFalse[ltSplit[0]] = (bound, r2)
+        if r2 >= bound:
+            rangesFalse[ltSplit[0]] = (bound, r2)
+            doFalse = True
+    else:
+        # greater than
+        bound = int(gtSplit[1])
+        (r1, r2) = ranges[gtSplit[0]]
 
-                    total += totalAcceptedIn(workflows, name, i + 1, rangesFalse)
-                
-                return total
-            else:
-                # greater than
-                bound = int(gtSplit[1])
-                (r1, r2) = ranges[gtSplit[0]]
+        if r2 > bound:
+            rangesTrue[gtSplit[0]] = (bound + 1, r2)
+            doTrue = True
 
-                total = 0
+        if r1 <= bound:
+            rangesFalse[gtSplit[0]] = (r1, bound)
+            doFalse = True
 
-                # true branch
-                if r2 > bound:
-                    rangesTrue = copy.deepcopy(ranges)
-                    rangesTrue[gtSplit[0]] = (bound + 1, r2)
+    total = 0
 
-                    if colonSplit[1] == 'A':
-                        total += getRangesSize(rangesTrue)
-                    elif colonSplit[1] == 'R':
-                        total += 0
-                    else:
-                        total += totalAcceptedIn(workflows, colonSplit[1], 0, rangesTrue)
+    if doTrue:
+        if colonSplit[1] == 'A':
+            total += getRangesSize(rangesTrue)
+        elif colonSplit[1] != 'R':
+            total += totalAcceptedIn(workflows, colonSplit[1], 0, rangesTrue)
+    if doFalse:
+        total += totalAcceptedIn(workflows, name, instrNum + 1, rangesFalse)
 
-                # false branch
-                if r1 <= bound:
-                    rangesFalse = copy.deepcopy(ranges)
-                    rangesFalse[gtSplit[0]] = (r1, bound)
-
-                    total += totalAcceptedIn(workflows, name, i + 1, rangesFalse)
-                
-                return total
+    return total
 
 def getRangesSize(ranges):
     total = 1
