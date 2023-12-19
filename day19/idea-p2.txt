@@ -1,0 +1,23 @@
+Idea: Say we have the following condition:
+
+in:{a>1000:[path1],[path2]}
+
+Then effectively, we start with the following set of ranges:
+{x: [1,4000], m: [1,4000], a: [1,4000], s: [1,4000]}
+
+and after executing the start of the workflow, we get:
+path1:
+    {x: [1,4000], m: [1,4000], a: [1001,4000], s: [1,4000]}
+path2:
+    {x: [1,4000], m: [1,4000], a: [1,1000], s: [1,4000]}
+
+and then if we ever hit an A, the product of the ranges is added to the total
+and if we ever hit an R, 0 is added to the total
+
+so the idea is:
+- if hit A, add prod to total
+- if hit R, add 0 to total
+- if hit [workflowname], goto workflow
+- if hit conditional, recurse into two "parallel universes"
+    - return the sum of the two totals
+    - BUT, if either branch has size 0, only do 1 recursion
