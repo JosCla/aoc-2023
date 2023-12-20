@@ -1,0 +1,37 @@
+so let's look at a snippet of my input file
+
+&kj -> rx
+&ln -> kj
+&dr -> kj
+&qs -> kf, dr, sc, rg, gl, dx
+%rg -> qs, vq
+%lh -> qs, dl
+%mv -> qs, gl
+%ts -> ng, qs
+%ab -> ln
+
+so if you really think about it, these conjunctions are just and-gates.
+
+we can kinda just break it down until we get all the flip-flops being and'ed
+
+rx = kj
+rx = (ln && dr)
+rx = (%ab && dr)
+rx = (%ab && qs)
+rx = (%ab && (%rg && %lh && %mv && %ts))
+rx = (%ab && %rg && %lh && %mv && %ts)
+
+that's all well and good, and it seems then like we'd just chinese remainder
+theorem for the flip-flop cycles. but i'm not 100% confident on that - you
+could get patterns where in 100 cycles, some flip-flop pulls high like 45
+cycles, then you have a lot of CRT to do. more than is feasible, i think!
+
+well actually, in my input kj is the and of four conjunctions. i decided to
+print when just one of those conjunctions pulls high, and it had consistent
+cycle lengths of 4003, zero-based even! i'm gonna go test all four
+
+omg they all have consistent zero-based cycles
+
+lol cool the lcm was the answer
+
+yikes that problem could have been a looooooot harder
