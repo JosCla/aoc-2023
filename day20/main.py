@@ -97,9 +97,6 @@ def pressButton(mods, lookFor = ""):
             else:
                 totalLow += 1
 
-            if receiver == "rx" and not isHigh:
-                rxLow = True
-
             if receiver in mods:
                 res = mods[receiver].receivePulse(sender, isHigh)
                 for nextRecv, nextIsHigh in res:
@@ -135,9 +132,24 @@ def lcm(n1, n2):
     return int(n1 * n2 / gcd(n1, n2))
 
 def partTwo(lines):
-    res = 1
+    mods = getModules(lines)
 
-    for look in ["ln", "dr", "zx", "vn"]:
+    # finding conjunction just before rx
+    rxConj = ""
+    for key, val in mods.items():
+        if "rx" in val.getMods():
+            rxConj = key
+            break
+
+    # finding conjunctions to look for
+    toLook = []
+    for key, val in mods.items():
+        if rxConj in val.getMods():
+            toLook.append(key)
+
+    # finding cycle sizes of those conjunctions
+    res = 1
+    for look in toLook:
         mods = getModules(lines)
 
         if not look in mods:
