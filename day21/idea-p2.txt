@@ -1,0 +1,100 @@
+an observation about the input:
+
+from the start point, you can always walk directly in the four cardinal
+directions to reach the next repeated tile.
+
+thus, if we have some really distant grid repeat - say, repeat (500, 700), then
+the quickest way to get to it should always be to walk 500 grid widths right,
+and 700 grid widths up (though i might want to simulate with the grids left,
+bottom, and bottom-left as well in case weaving through the corner works better
+in certain circumstances) (though actually, looking at my own input, the grid
+edges are empty too!!! oml we really only *do* need to simulate single blocks)
+
+
+
+but anyhow, when you really think about it, this pretty much means our infinite
+walk will end up expanding sort of like this (with # representing infinite
+repeats):
+
+........#........
+.......##a.......
+......###ba......
+.....####cba.....
+....#####ccba....
+...######cccba...
+..#############..
+...###########...
+....#########....
+.....#######.....
+......#####......
+.......###.......
+........#........
+
+and the nice thing is, since walking through grids' centers and edges is so
+nicely defined, all grids labeled 'a' are equal, all grids labeled 'b' are
+equal, etc
+
+and once we get far enough into the grid, represented by 'c', we'll have so
+many steps that all the internal grids will have the exact same counts -
+representing a flood-fill of the whole grid!
+(in fact, given the input sparsity, i'd wager there could only be up to two
+outer rims before it reaches uniformity)
+
+but there's one more important thing to think about:
+the grid size is odd in on both axes, so each grid will have an alternating
+parity.
+
+okay so uhhhh how do i calculate the area of this
+concentric rings have areas: 1, 4, 8, 12, 16 oh not bad it's add four
+
+
+
+so here's my plan:
+simulate an inner even parity
+simulate an inner outer parity
+simulate the four diagonal edges
+    (start in inner corner with some calculated number of steps remaining)
+    (then keep doing this, adding 131 steps at a time, until reaches uniform)
+simulate the four "orthogonal" edges
+    (start on edge)
+
+okie dokie it's time to code
+
+
+
+alright this isn't going too hot
+getting too low of answers, and i can't verify well against the sample input
+cuz it doesn't have the same nice properties as the actual input
+
+i'd like to make a solution that can verify the sample, too!
+
+so anyways, here's a funny idea.
+take the sample input. it has 11x11 tiling, 5000 steps
+
+say i actually just simulated the following (each # is a repeat):
+#########
+#########
+#########
+#########
+#########
+#########
+#########
+#########
+#########
+
+*but*, i'm not actually doing 5000 steps!
+
+if i took 5000 steps out north, i would first take 6 steps north, then 11 + 11
++ 11 + 11 + ... = 4994 steps more, and i'd end up in the square in bottom of
+the north of the diamond
+
+so what if instead i just gave myself that 9x9 repeat grid above, and gave
+myself exactly 6 + 11 + 11 + 11 = 39 steps?
+
+this seems really obnoxious to code though, and i'm really certain my original
+solution should be sound! oof i'm gonna keep trying my original thing - i just
+can't use the sample input
+
+
+
+after some hours of debugging: it works! (the original idea)
