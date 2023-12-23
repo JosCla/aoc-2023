@@ -1,0 +1,14 @@
+looking at the sample input and my real input, i see something interesting:
+
+the only real "choice points" in this maze are the arrow junctions. so really
+if you think about it, if we represent each choice point as a node and the
+distance to the "adjacent" choice points as edges, we get a pretty simple graph
+out of this whole deal.
+
+also, the sample input has 7 choice points and my real input only has ~30. this
+is pretty brute-forceable, lol. which i should hope it is, because while
+min-length is a well-defined and simple problem, max-length really isn't...
+
+(and besides i kinda feel like we're going to have to brute-force it in part 2
+when some elf hands us a cane or something and is all like "now you can go up
+the slippery slopes!")
