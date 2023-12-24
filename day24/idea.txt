@@ -1,0 +1,71 @@
+part 1:
+
+find the t1, t2, x, and y for which
+y = y1 + vy1t1
+x = x1 + vx1t1
+y = y2 + vy2t2
+x = x2 + vx2t2
+
+[   0,   1,-vy1,   0] [x]    [y1]
+[   1,   0,-vx1,   0] [y]  = [x1]
+[   0,   1,   0,-vy2] [t1]   [y2]
+[   1,   0,   0,-vx2] [t2]   [x2]
+
+looks like a job for numpy linear system of equations
+
+
+
+part 2:
+
+let's say we have some flying stones A and B.
+for them to collide, there must exist some t for which
+    Ax+(Avx)t = Bx + (Bvx)t
+    Ay+(Avy)t = By + (Bvy)t
+    Az+(Avz)t = Bz + (Bvz)t
+
+except in our case, all A are unknown!
+    A starts as 6 unknowns
+    each extra B adds 3 equations and 1 unknown (the t)
+
+    thus if we have three hailstones B, C, and D we get 9 equations 9 unknowns
+
+and the nice thing is, this suggests we only need to look at the first three
+hailstones to find how to throw our own stone
+
+big issue: the above equations are nonlinear equations... this may demand a
+more clever solution. or good use of scipy fsolve. lol
+
+
+
+oh dear. scipy.fsolve is not working! the numbers are just too large!
+
+though there's an interesting technique i remember from day 23 of 2018: a sort
+of radix search. it might be applicable here.
+
+say the final position X needs to be like 188234877843.
+it would be intractible to iterate all the way from 0 to that.
+so, what if we did it one digit at a time?
+so our iteration would be like:
+iterate 100000000000, 200000000000, ..., 900000000000
+then 1000.... - 2000.... is the closest, so next iterate digits in that range
+188234877843
+
+actually, let's not do it on X; the time variables encode a lot more!
+
+say we intersect A at tA, B at tB, C at tC
+
+we can do this sort of radix search on tA, tB, tC, simultaneously. what is the
+"cost" at each point? do this by fitting our thrown stone to tA and tB, then
+calculating where it would be at tC, and where C would be at tC. the distance
+is the cost, and we're trying to minimize the cost.
+
+first we start with a center of (0, 0, 0) with a step size of 10^11 in all
+directions, and a breadth of -10 to 10 steps. then we'd find some best center
+of like (2 * 10^11, -3 * 10^11, 7 * 10^11) that becomes our new center. repeat
+with a step size of 10^10. repeat again and again until we finish 10^0 step
+size.
+
+at this point, we should find a cost of 0, and our answer is the final center
+
+i ended up shuffling through a few starting indices, until i found the right
+answer. yippee!
